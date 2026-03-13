@@ -9,13 +9,11 @@ from mcp.server import Server
 from mcp.types import Tool, TextContent
 from mcp.server.stdio import stdio_server
 
-from config import get_config
 from cherrymcp.tools.knowledge_tools import KnowledgeTools
 
 
 async def main():
     """主入口函数"""
-    config = get_config()
     knowledge_tools = KnowledgeTools()
     
     server = Server("cherry-mcp")

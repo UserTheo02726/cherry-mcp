@@ -3,7 +3,6 @@
 """
 from typing import Optional
 
-from config import get_config
 from cherrymcp.knowledge import (
     KnowledgeBaseManager,
     EmbeddingClient,
@@ -15,9 +14,8 @@ from cherrymcp.knowledge import (
 class KnowledgeTools:
     """知识库工具类"""
     
-    def __init__(self, config_path: Optional[str] = None):
-        config = get_config(config_path)
-        kb_config = get_kb_config(config.knowledge_base_config)
+    def __init__(self):
+        kb_config = get_kb_config()
         
         self.kb_manager = KnowledgeBaseManager(kb_config)
         self.embedding_client = EmbeddingClient(kb_config)
