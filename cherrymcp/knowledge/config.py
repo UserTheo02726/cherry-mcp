@@ -52,9 +52,9 @@ class SearchConfig:
     def __init__(self, config: Optional[dict] = None):
         config = config or {}
         
-        self.default_top_k = config.get("default_top_k", DEFAULT_TOP_K)
-        self.default_threshold = config.get("default_threshold", DEFAULT_THRESHOLD)
-        self.max_fetch = config.get("max_fetch", DEFAULT_MAX_FETCH)
+        self.default_top_k = int(config.get("default_top_k") or os.environ.get("DEFAULT_TOP_K", DEFAULT_TOP_K))
+        self.default_threshold = float(config.get("default_threshold") or os.environ.get("DEFAULT_THRESHOLD", DEFAULT_THRESHOLD))
+        self.max_fetch = int(config.get("max_fetch") or os.environ.get("MAX_FETCH", DEFAULT_MAX_FETCH))
 
 
 class KnowledgeBaseConfig:

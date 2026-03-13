@@ -1,122 +1,129 @@
----
-title: cherry-mcp
-description: Cherry Studio 知识库 MCP 服务 - 通过直接读取 Cherry Studio 知识库数据库，实现智能问答
----
+# Cherry Studio 知识库检索工具
 
-# cherry-mcp
+本地 CLI 工具，用于从 Cherry Studio 知识库中搜索内容。
 
-Cherry Studio 知识库 MCP 服务，通过直接读取 Cherry Studio 知识库数据库，结合嵌入模型实现智能问答。
+## 功能
 
-## 特性
-
-- 直接读取 Cherry Studio 知识库 SQLite 数据库
-- 支持多种嵌入模型服务商 (SiliconFlow、LM Studio、Ollama)
+- 列出所有知识库
 - 向量相似度搜索
-- MCP 协议兼容 (stdio 方式连接)
+- 支持自定义搜索参数（top_k、threshold）
 
-## 架构流程
-```
-┌──────────────┐     ┌─────────────────┐     ┌────────────────┐     ┌─────────────┐
-│   AI IDE     │────▶│  MCP Server     │────▶│  Knowledge Base │────▶│  Embedding  │
-│ (Cline/opencode) │◀────│  (Python)       │◀────│   (SQLite)     │◀────│   Service   │
-└──────────────┘     └─────────────────┘     └────────────────┘     └─────────────┘
-```
-
-## 环境要求
-
-- Python 3.10+
-
-## 快速开始
-
-### 1. 克隆项目
+## 安装
 
 ```bash
-git clone <repo-url>
-cd cherry-mcp
-```
-
-### 2. 创建虚拟环境
-
-```bash
-# Windows
+# 创建虚拟环境
 python -m venv venv
-.\venv\Scripts\Activate.ps1
 
-# Linux/Mac
-python -m venv venv
-source venv/bin/activate
+# 安装依赖
+venv\Scripts\pip.exe install -r requirements.txt
+
+# 复制配置
+copy .env.example .env
+
+# 编辑 .env 文件，填入你的配置
 ```
 
-### 3. 安装依赖
+## 配置 (.env)
 
-```bash
-pip install -r requirements.txt
-```
+**重要**：嵌入模型配置必须与 Cherry Studio 中创建知识库时的设置完全一致，否则搜索将无法返回正确结果。
 
-### 4. 配置
+### 嵌入模型配置说明
 
-#### .env 文件（IDE 调用时使用）
+| 参数 | 说明 | 注意事项 |
+|------|------|----------|
+| `EMBEDDING_URL` | 嵌入模型 API 地址 | 必须与 Cherry Studio 知识库设置中的 API 地址一致 |
+| `EMBEDDING_API_KEY` | 嵌入模型 API 密钥 | 必须与 Cherry Studio 中使用的密钥一致 |
+| `EMBEDDING_MODEL` | 嵌入模型名称 | **必须与知识库创建时使用的模型一致** |
+| `EMBEDDING_DIMENSION` | 向量维度 | **必须与知识库的向量维度一致，否则搜索无结果** |
 
-在项目根目录创建 `.env` 文件：
+### 如何获取配置
 
-```
+1. 打开 Cherry Studio
+2. 进入「知识库」设置
+3. 查看嵌入模型配置
+4. 将对应参数填入 `.env`
+
+```env
+# Cherry Studio 知识库路径
 CHERRYSTUDIO_KB_PATH=C:/Users/Theo/AppData/Roaming/CherryStudio/Data/KnowledgeBase
+
+# 嵌入模型配置（必须与 Cherry Studio 知识库设置一致）
 EMBEDDING_URL=https://api.siliconflow.cn
 EMBEDDING_API_KEY=sk-your-api-key
 EMBEDDING_MODEL=BAAI/bge-m3
 EMBEDDING_DIMENSION=1024
+
+# 搜索参数（可选）
+DEFAULT_TOP_K=20
+DEFAULT_THRESHOLD=0.5
+MAX_FETCH=1000
 ```
 
-| 环境变量 | 说明 | 示例 |
-|----------|------|------|
-| CHERRYSTUDIO_KB_PATH | 知识库路径 | C:/Users/.../KnowledgeBase |
-| EMBEDDING_URL | 嵌入模型 API 地址 | https://api.siliconflow.cn |
-| EMBEDDING_API_KEY | API 密钥 | sk-xxx |
-| EMBEDDING_MODEL | 嵌入模型 ID | BAAI/bge-m3 |
-| EMBEDDING_DIMENSION | 向量维度 | 1024 |
+### 向量维度不匹配问题
 
-> **重要**：嵌入模型配置必须与 Cherry Studio 创建知识库时使用的嵌入模型完全一致。
+如果搜索返回 0 条结果，很可能是向量维度不匹配：
 
-#### config.json（文档参考，仅供参考）
+- 知识库向量维度：查看 Cherry Studio 知识库数据库中的向量维度
+- 配置中的维度：必须与上述维度完全一致
 
-```json
-{
-  "cherry-mcp": {
-    "search": {
-      "default_top_k": 20,
-      "default_threshold": 0.5,
-      "max_fetch": 1000
-    }
-  }
-}
-```
+**常见向量维度**：
+- `text-embedding-qwen3-embedding-8b`: 4096
+- `BAAI/bge-m3`: 1024
+- `BAAI/bge-large-zh-v1.5`: 1024
 
-> 注意：此文件仅用于文档参考，不参与代码运行。
-
-### 5. 运行
+## 使用方法
 
 ```bash
-python main.py
+# 激活虚拟环境
+venv\Scripts\activate.bat
+
+# 列出知识库
+python main.py list
+
+# 搜索知识库（使用默认参数）
+python main.py search "关键词"
+
+# 搜索知识库（自定义参数）
+python main.py search "关键词" --top-k 5 --threshold 0.6
+
+# Windows 中文输出
+set PYTHONIOENCODING=utf-8
+python main.py search "关键词"
 ```
 
-## 错误排查
+## 命令行参数
 
-| 错误 | 原因 | 解决方案 |
-|------|------|----------|
-| 嵌入失败 | API 错误 | 检查 url、api_key 配置 |
-| 搜索无结果 | 向量维度不匹配 | 检查 dimension 是否与知识库一致 |
-| 知识库未找到 | 路径错误 | 检查 path 配置是否正确 |
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--top-k` | 返回结果数量 | 20 |
+| `--threshold` | 相似度阈值 (0-1) | 0.5 |
+| `--kb-name` | 指定知识库名称 | 全部 |
 
-## 技术栈
+## 项目结构
+
+```
+cherry-mcp/
+├── main.py                 # CLI 入口
+├── .env                   # 配置文件
+├── requirements.txt        # 依赖
+├── venv/                  # 虚拟环境
+│
+└── cherrymcp/
+    └── knowledge/
+        ├── config.py       # 配置读取
+        ├── embedding.py    # 文本向量化
+        ├── knowledge_base.py  # 知识库管理
+        └── vector_search.py   # 向量搜索
+```
+
+## 依赖
 
 - Python 3.10+
-- MCP SDK
 - httpx
 - numpy
-- SQLite
+- python-dotenv
 
-## 参考
+## TODO 计划
 
-- [Cherry Studio](https://cherry-ai.com)
-- [MCP SDK](https://github.com/modelcontextprotocol/python-sdk)
-- [SiliconFlow](https://siliconflow.cn)
+- [ ] 封装为 MCP 工具，可被 AI IDE（如 Cursor、OpenCode）调用
+- [ ] 支持 SSE 模式运行，提供 HTTP API 接口
