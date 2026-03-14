@@ -4,14 +4,16 @@ Cherry Studio 知识库检索工具
 本地 CLI 工具，用于从 Cherry Studio 知识库中搜索内容。
 
 用法:
-    python main.py search "关键词"          # 搜索知识库
+    python main.py search "关键词"          # 搜索所有知识库
     python main.py list                      # 列出所有知识库
+    python main.py search "关键词" --kb-name "my-kb"  # 搜索指定知识库
     python main.py search "关键词" --top-k 5  # 指定返回数量
     python main.py search "关键词" --threshold 0.6  # 指定相似度阈值
 """
 import argparse
 import asyncio
 import sys
+import logging
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -20,70 +22,80 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent / ".env"
 load_dotenv(env_path)
 
-from cherrymcp.knowledge import get_kb_config, KnowledgeBaseManager, EmbeddingClient, VectorSearcher
+# 配置基础日志格式
+logging.getLogger().setLevel(logging.INFO)
+logging.basicConfig(
+    format="%(levelname)s: %(message)s"
+)
+
+from cherrymcp.knowledge import KnowledgeBaseManager, VectorSearcher
 
 
 def list_knowledge_bases() -> str:
     """列出所有知识库"""
-    from cherrymcp.knowledge import KnowledgeBaseManager
-    config = get_kb_config()
-    kb_manager = KnowledgeBaseManager(config)
-    kbs = kb_manager.list_knowledge_bases()
-    
-    if not kbs:
-        return "未找到知识库，请确保 Cherry Studio 已创建知识库。"
-    
-    result = "可用知识库列表:\n\n"
-    for kb in kbs:
-        size_mb = kb["size"] / (1024 * 1024)
-        result += f"- {kb['name']}\n"
-        result += f"  大小: {size_mb:.2f} MB\n\n"
-    
-    return result
+    try:
+        kb_manager = KnowledgeBaseManager()
+        kbs = kb_manager.list_knowledge_bases()
+        
+        if not kbs:
+            return "未找到知识库，请确保 Cherry Studio 已在配置目录下创建知识库。"
+        
+        result = "可用知识库列表:\n\n"
+        for kb in kbs:
+            size_mb = kb["size"] / (1024 * 1024)
+            result += f"- {kb['name']}\n"
+            result += f"  路径: {kb['path']}\n"
+            result += f"  大小: {size_mb:.2f} MB\n"
+            if kb['dimension'] > 0:
+                result += f"  向量维度: {kb['dimension']}d\n"
+            else:
+                result += "  向量维度: 未知\n"
+            result += f"  向量数量: {kb['vector_count']} 条\n\n"
+        
+        return result
+    except Exception as e:
+        logging.error(f"获取知识库列表失败: {e}")
+        sys.exit(1)
 
 
 async def search_knowledge(
     query: str,
     top_k: int | None = None,
     threshold: float | None = None,
-    kb_name: str | None = None
+    kb_name: str | None = None,
+    max_fetch: int | None = None
 ) -> str:
     """搜索知识库"""
-    config = get_kb_config()
-    
-    # 使用传入的参数或从配置读取默认值
-    actual_top_k = top_k if top_k is not None else config.search.default_top_k
-    actual_threshold = threshold if threshold is not None else config.search.default_threshold
-    
-    kb_manager = KnowledgeBaseManager(config)
-    embedding_client = EmbeddingClient(config)
-    searcher = VectorSearcher(kb_manager, embedding_client)
-    
-    try:
-        results = await searcher.search(
-            query=query,
-            top_k=actual_top_k,
-            threshold=actual_threshold,
-            kb_name=kb_name
-        )
-        
-        if not results:
-            return f"未找到与「{query}」相关的内容。"
-        
-        output = f"搜索「{query}」找到 {len(results)} 条结果 (top_k={actual_top_k}, threshold={actual_threshold}):\n\n"
-        
-        for i, r in enumerate(results, 1):
-            score = r["score"]
-            source = r["source"]
-            content = r["content"]
+    async with VectorSearcher() as searcher:
+        try:
+            results = await searcher.search(
+                query=query,
+                top_k=top_k,
+                threshold=threshold,
+                kb_name=kb_name,
+                max_fetch=max_fetch
+            )
             
-            output += f"--- 结果 {i} (相似度: {score:.2%}) ---\n"
-            output += f"来源: {source}\n"
-            output += f"内容: {content}\n\n"
-        
-        return output
-    finally:
-        await searcher.close()
+            if not results:
+                target = f"知识库「{kb_name}」" if kb_name else "所有知识库"
+                return f"在{target}中未找到与「{query}」相关的高相似度内容。"
+            
+            output = f"搜索「{query}」找到 {len(results)} 条结果:\n\n"
+            
+            for i, r in enumerate(results, 1):
+                score = r["score"]
+                source = r.get("source", "未知来源")
+                content = r.get("content", "")
+                
+                output += f"--- 结果 {i} (相似度: {score:.2%}) ---\n"
+                output += f"来源: {source}\n"
+                output += f"内容: {content}\n\n"
+            
+            return output
+            
+        except Exception as e:
+            logging.error(f"搜索过程出现异常: {e}")
+            sys.exit(1)
 
 
 def main():
@@ -97,6 +109,7 @@ def main():
   python main.py search "什么是 AI"
   python main.py search "如何安装" --top-k 5
   python main.py search "配置" --threshold 0.7
+  python main.py search "常见问题" --kb-name "my-knowledge-base"
         """
     )
     
@@ -110,7 +123,8 @@ def main():
     search_parser.add_argument("query", type=str, help="搜索关键词")
     search_parser.add_argument("--top-k", type=int, help="返回结果数量")
     search_parser.add_argument("--threshold", type=float, help="相似度阈值 (0-1)")
-    search_parser.add_argument("--kb-name", type=str, help="指定知识库名称")
+    search_parser.add_argument("--kb-name", type=str, help="指定知识库名称（不指定则检索全部）")
+    search_parser.add_argument("--max-fetch", type=int, help="从数据库最多获取的文档数")
     
     args = parser.parse_args()
     
@@ -127,10 +141,13 @@ def main():
             query=args.query,
             top_k=args.top_k,
             threshold=args.threshold,
-            kb_name=args.kb_name
+            kb_name=args.kb_name,
+            max_fetch=args.max_fetch
         ))
         print(result)
 
 
 if __name__ == "__main__":
+    # 配置 httpx 的日志等级，避免 debug 信息干扰
+    logging.getLogger("httpx").setLevel(logging.WARNING)
     main()

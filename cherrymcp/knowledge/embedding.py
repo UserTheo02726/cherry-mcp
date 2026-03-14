@@ -4,12 +4,18 @@
 提供对嵌入 API 的访问能力
 """
 from typing import Optional
+import logging
 
 import httpx
 import numpy as np
 
 from .config import get_kb_config, KnowledgeBaseConfig
 
+logger = logging.getLogger(__name__)
+
+class EmbeddingError(Exception):
+    """嵌入模型调用异常"""
+    pass
 
 class EmbeddingClient:
     """嵌入模型客户端"""
@@ -18,14 +24,17 @@ class EmbeddingClient:
         self.config = config or get_kb_config()
         self._client = httpx.AsyncClient(timeout=30)
     
-    async def embed_text(self, text: str) -> Optional[np.ndarray]:
+    async def embed_text(self, text: str) -> np.ndarray:
         """将文本转为嵌入向量
         
         Args:
             text: 输入文本
             
         Returns:
-            嵌入向量，失败返回 None
+            嵌入向量
+            
+        Raises:
+            EmbeddingError: 嵌入模型调用失败时抛出异常
         """
         try:
             response = await self._client.post(
@@ -44,10 +53,10 @@ class EmbeddingClient:
             return np.array(embedding, dtype=np.float32)
         
         except Exception as e:
-            print(f"嵌入失败: {e}")
-            return None
+            logger.error(f"嵌入文本失败: {e}")
+            raise EmbeddingError(f"嵌入文本失败: {e}") from e
     
-    async def embed_batch(self, texts: list[str]) -> list[Optional[np.ndarray]]:
+    async def embed_batch(self, texts: list[str]) -> list[np.ndarray]:
         """批量将文本转为嵌入向量
         
         Args:
@@ -55,6 +64,9 @@ class EmbeddingClient:
             
         Returns:
             嵌入向量列表
+            
+        Raises:
+            EmbeddingError: 嵌入模型调用失败时抛出异常
         """
         try:
             response = await self._client.post(
@@ -76,8 +88,8 @@ class EmbeddingClient:
             return embeddings
         
         except Exception as e:
-            print(f"批量嵌入失败: {e}")
-            return [None] * len(texts)
+            logger.error(f"批量嵌入失败: {e}")
+            raise EmbeddingError(f"批量嵌入失败: {e}") from e
     
     async def close(self):
         """关闭客户端"""
