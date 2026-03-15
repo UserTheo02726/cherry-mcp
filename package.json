@@ -1,0 +1,22 @@
+{
+  "name": "cherry-mcp",
+  "version": "1.0.0",
+  "description": "Cherry Studio 知识库 MCP 服务 - 通过 npx 一键调用，无需 Python 环境",
+  "type": "module",
+  "bin": {
+    "cherry-mcp": "./src/index.js"
+  },
+  "files": [
+    "src/"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["cherry-studio", "mcp", "knowledge-base", "rag", "vector-search"],
+  "author": "Theo",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "sql.js": "^1.12.0"
+  }
+}

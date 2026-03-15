@@ -1,27 +1,11 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-.venv/
-env/
-.env
-*.egg-info/
-dist/
-build/
+# npm 依赖目录（不入 git，npx 自动安装）
+node_modules/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# 本地测试配置文件（含 API Key 等敏感信息）
+test-config.env
 
-# OS
+# 临时测试脚本
+test.js
+
+# macOS 原生垃圾
 .DS_Store
-Thumbs.db
-
-# Environment
-.env
-config.json
