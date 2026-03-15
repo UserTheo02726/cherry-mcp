@@ -27,6 +27,30 @@ description: Cherry Studio 知识库 MCP 服务
   }
 }
 ```
+opencode
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "cherry-mcp": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "cherry-mcp",
+        "--top-k", "10",
+        "--threshold", "0.6",
+        "--kb-path", "C:\\Users\\你的用户名\\AppData\\Roaming\\CherryStudio\\Data\\KnowledgeBase",
+        "--embed-url", "http://127.0.0.1:1234",
+        "--embed-model", "text-embedding-qwen3-embedding-8b",
+        "--embed-dim", "4096"
+      ],
+      "enabled": true
+    }
+  }
+}
+```
 
 > `--embed-api-key` 使用本地模型时可省略；首次执行 npm 会自动安装依赖。
 
