@@ -1,6 +1,6 @@
 {
   "name": "cherry-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Cherry Studio 知识库 MCP 服务 - 通过 npx 一键调用，无需 Python 环境",
   "type": "module",
   "bin": {
