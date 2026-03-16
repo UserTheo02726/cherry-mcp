@@ -52,6 +52,15 @@ function resolveRequired(key, cliKey, envKey) {
   return value;
 }
 
+/** 解析 embed-url，自动补全 /v1/embeddings 路径 */
+function resolveEmbedUrl(raw) {
+  if (!raw) {
+    throw new Error(`embed-url 为必填参数，请通过 CLI 参数 --embed-url 或环境变量 EMBEDDING_URL 提供`);
+  }
+  const trimmed = raw.replace(/\/$/, '');
+  return trimmed.endsWith('/v1/embeddings') ? trimmed : `${trimmed}/v1/embeddings`;
+}
+
 /** 解析必填数值参数，如果未提供或无效则抛出错误 */
 function resolveRequiredInt(key, cliKey, envKey) {
   const raw = argv[cliKey] ?? process.env[envKey] ?? null;
@@ -72,7 +81,7 @@ const config = {
   maxFetch:    parseInt(argv['max-fetch']  ?? process.env.MAX_FETCH           ?? DEFAULTS.maxFetch,   10),
   kbName:      argv['kb-name']      ?? process.env.DEFAULT_KB_NAME    ?? null,
   kbPath:      argv['kb-path']      ?? process.env.CHERRYSTUDIO_KB_PATH ?? getDefaultKbPath(),
-  embedUrl:    resolveRequired('embed-url', 'embed-url', 'EMBEDDING_URL'),
+  embedUrl:    resolveEmbedUrl(argv['embed-url'] ?? process.env.EMBEDDING_URL),
   embedApiKey: argv['embed-api-key'] ?? process.env.EMBEDDING_API_KEY ?? '',
   embedModel:  resolveRequired('embed-model', 'embed-model', 'EMBEDDING_MODEL'),
   embedDim:    resolveRequiredInt('embed-dim', 'embed-dim', 'EMBEDDING_DIMENSION'),

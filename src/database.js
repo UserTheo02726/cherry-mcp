@@ -106,12 +106,22 @@ export async function listKnowledgeBases() {
     if (probe === null) continue; // 不是合法的 vectors 数据库
 
     const stat = statSync(filePath);
+    const vectorCount = probe.count;
+    
+    // 根据向量数计算建议参数
+    const suggestedTopK = Math.min(50, Math.max(20, Math.floor(vectorCount / 50)));
+    const suggestedMaxFetch = Math.min(5000, Math.max(500, vectorCount * 2));
+    const suggestedThreshold = 0.5;
+
     result.push({
       name: basename(filePath, extname(filePath)),
       path: filePath,
       sizeMb: +(stat.size / 1024 / 1024).toFixed(2),
-      vectorCount: probe.count,
+      vectorCount,
       dimension: probe.dimension ?? 'unknown',
+      suggestedTopK,
+      suggestedMaxFetch,
+      suggestedThreshold,
     });
   }
 
