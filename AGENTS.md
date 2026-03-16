@@ -133,9 +133,16 @@ CLI 参数 > 环境变量
 # 1. 修改版本号
 npm version patch  # 或手动修改 package.json
 
-# 2. 推送代码
-git add . && git commit -m "release: v1.x.x" && git push
+# 2. 同步更新 package-lock.json（重要！）
+npm install
+
+# 3. 一起提交并推送
+git add package.json package-lock.json
+git commit -m "release: v1.x.x"
+git push
 ```
+
+> ⚠️ **必须同时提交 package-lock.json**，否则用户通过 `npx cherry-mcp@latest` 安装时可能获取到旧版本的依赖锁定文件。
 
 ## 10. 常用命令速查
 
