@@ -105,18 +105,48 @@ description: Cherry Studio 知识库 MCP 服务
 
 ## 本地开发
 
+> ⚠️ MCP 服务启动后会等待 IDE 客户端连接，不会显示交互界面。
+
 ```bash
 # 克隆项目
 git clone https://github.com/<your-name>/cherry-mcp.git
-
-# 指定目录
 cd cherry-mcp
 
 # 安装依赖
 npm install
 
-# 替换自己的参数(嵌入式模型和路径)
-node src/index.js --kb-path "C:\Users\你的用户名\AppData\Roaming\CherryStudio\Data\KnowledgeBase" --embed-url "https://api.siliconflow.cn" --embed-api-key "sk-xxx" --embed-model "BAAI/bge-m3" --embed-dim 1024 --top-k 5
+# 启动 MCP 服务（等待 IDE 客户端连接）(替换自己的参数)
+node src/index.js --embed-url "http://127.0.0.1:1234" --embed-model "text-embedding-qwen3-embedding-8b" --embed-dim 4096
+
+# 或者
+EMBEDDING_URL=http://127.0.0.1:1234 EMBEDDING_MODEL=text-embedding-qwen3-embedding-8b EMBEDDING_DIMENSION=4096 node src/index.js
+
+```
+
+## 本地测试工具
+
+> 直接运行脚本测试，无需启动 MCP 服务。
+
+```bash
+# 测试 list_knowledge_bases
+node -e "
+import { listKnowledgeBases } from './src/database.js';
+const kbs = await listKnowledgeBases();
+console.log(JSON.stringify(kbs, null, 2));
+" --embed-url "http://127.0.0.1:1234" --embed-model "text-embedding-qwen3-embedding-8b" --embed-dim 4096
+
+# 测试 search_knowledge（需要 embedding 服务运行中）
+node -e "
+import { embedText, searchVectors } from './src/embedding.js';
+const queryVector = await embedText('你的查询');
+const results = await searchVectors(queryVector, { topK: 3, threshold: 0.3 });
+for (const r of results) {
+  console.log('--- 相似度:', (r.score * 100).toFixed(1) + '% ---');
+  console.log('来源:', r.source);
+  console.log('内容:', r.content.substring(0, 200) + '...');
+  console.log('');
+}
+" --embed-url "http://127.0.0.1:1234" --embed-model "text-embedding-qwen3-embedding-8b" --embed-dim 4096
 ```
 
 ## 所需前置
