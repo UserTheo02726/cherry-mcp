@@ -116,20 +116,6 @@ npm install
 node src/index.js --kb-path "C:\Users\你的用户名\AppData\Roaming\CherryStudio\Data\KnowledgeBase" --embed-url "https://api.siliconflow.cn" --embed-api-key "sk-xxx" --embed-model "BAAI/bge-m3" --embed-dim 1024 --top-k 5
 ```
 
-## 发布到 NPM
-
-若要让任何电脑都能直接 `npx cherry-mcp`：
-
-```bash
-# 1. 注册并登录 npm 账号（仅首次）
-npm login
-
-# 2. 发布
-npm publish
-```
-
-> 发布后，全球任何安装了 Node.js 的用户只需一句 `npx cherry-mcp` 即可使用。
-
 ## 所需前置
 
 - Node.js ≥ 18（用于原生 `fetch` 与 `util.parseArgs`）
@@ -142,10 +128,10 @@ npm publish
 
 ### 高优先级
 
-- [ ] **配置 NPM_TOKEN**：在 GitHub 仓库 Secrets 中添加 NPM_TOKEN，并取消 `.github/workflows/publish.yml` 中的发布步骤注释
-- [ ] **移除硬编码默认值**：修改 `config.js`，移除 `embedModel` 和 `embedDim` 的默认值，要求用户必须显式提供
-- [ ] **移除不确定路径**：修改 `getDefaultKbPath()`，移除不确定的 Linux/macOS 路径避免误导
-- [ ] **发布到 npm**：配置完成后，首次发布到 npm 并验证 `npx cherry-mcp` 可正常运行
+- [x] **配置 NPM_TOKEN**：在 GitHub 仓库 Secrets 中添加 NPM_TOKEN，并取消 `.github/workflows/publish.yml` 中的发布步骤注释
+- [x] **移除硬编码默认值**：修改 `config.js`，移除 `embedModel` 和 `embedDim` 的默认值，要求用户必须显式提供
+- [x] **移除不确定路径**：修改 `getDefaultKbPath()`，移除不确定的 Linux/macOS 路径避免误导
+- [x] **发布到 npm**：配置完成后，首次发布到 npm 并验证 `npx cherry-mcp` 可正常运行
 
 ### 中优先级
 

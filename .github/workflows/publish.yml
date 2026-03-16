@@ -21,7 +21,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Get current version
+        id: version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Get published version
+        id: npm
+        run: |
+          PUBLISHED_VERSION=$(npm view . version 2>/dev/null || echo "0.0.0")
+          echo "published=$PUBLISHED_VERSION" >> $GITHUB_OUTPUT
+      
       - name: Publish to NPM
+        if: steps.version.outputs.current != steps.npm.outputs.published
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
