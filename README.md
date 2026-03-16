@@ -27,7 +27,6 @@ description: Cherry Studio 知识库 MCP 服务
   }
 }
 ```
-opencode
 
 ```json
 {
@@ -38,7 +37,7 @@ opencode
       "command": [
         "npx",
         "-y",
-        "cherry-mcp",
+        "cherry-mcp@latest",
         "--top-k", "10",
         "--threshold", "0.6",
         "--max-fetch", "1000",

@@ -1,7 +1,7 @@
 {
   "name": "cherry-mcp",
-  "version": "1.0.3",
-  "description": "Cherry Studio 知识库 MCP 服务 - 通过 npx 一键调用，无需 Python 环境",
+  "version": "1.0.4",
+  "description": "Cherry Studio 知识库 MCP 服务 - 通过 npx 一键调用",
   "type": "module",
   "bin": {
     "cherry-mcp": "./src/index.js"
@@ -10,7 +10,7 @@
     "src/"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "keywords": ["cherry-studio", "mcp", "knowledge-base", "rag", "vector-search"],
   "author": "Theo",
