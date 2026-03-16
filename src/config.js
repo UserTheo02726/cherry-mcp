@@ -15,12 +15,8 @@ function getDefaultKbPath() {
   const os = platform();
   if (os === 'win32') {
     return join(homedir(), 'AppData', 'Roaming', 'CherryStudio', 'Data', 'KnowledgeBase');
-  } else if (os === 'darwin') {
-    return join(homedir(), 'Library', 'Application Support', 'CherryStudio', 'Data', 'KnowledgeBase');
-  } else {
-    // Linux / WSL
-    return join(homedir(), '.config', 'CherryStudio', 'Data', 'KnowledgeBase');
   }
+  return null;
 }
 
 /** 解析命令行参数 */
@@ -43,8 +39,6 @@ const { values: argv } = parseArgs({
 /** 所有参数的内置默认值（集中管理，避免散落在各处）*/
 const DEFAULTS = {
   embedUrl:   'http://127.0.0.1:1234/v1/embeddings',
-  embedModel: 'text-embedding-qwen3-embedding-8b',
-  embedDim:   4096,
   topK:       20,
   threshold:  0.5,
   maxFetch:   1000,
@@ -57,6 +51,28 @@ function resolveEmbedUrl(raw) {
   return trimmed.endsWith('/v1/embeddings') ? trimmed : `${trimmed}/v1/embeddings`;
 }
 
+/** 解析必填参数，如果未提供则抛出错误 */
+function resolveRequired(key, cliKey, envKey) {
+  const value = argv[cliKey] ?? process.env[envKey] ?? null;
+  if (!value) {
+    throw new Error(`${key} 为必填参数，请通过 CLI 参数 --${cliKey} 或环境变量 ${envKey} 提供`);
+  }
+  return value;
+}
+
+/** 解析必填数值参数，如果未提供或无效则抛出错误 */
+function resolveRequiredInt(key, cliKey, envKey) {
+  const raw = argv[cliKey] ?? process.env[envKey] ?? null;
+  if (!raw) {
+    throw new Error(`${key} 为必填参数，请通过 CLI 参数 --${cliKey} 或环境变量 ${envKey} 提供`);
+  }
+  const value = parseInt(raw, 10);
+  if (isNaN(value) || value <= 0) {
+    throw new Error(`${key} 必须为正整数，当前值: ${raw}`);
+  }
+  return value;
+}
+
 /** 统一的配置对象，所有模块均从这里读取 */
 const config = {
   topK:        parseInt(argv['top-k']      ?? process.env.DEFAULT_TOP_K      ?? DEFAULTS.topK,       10),
@@ -66,8 +82,8 @@ const config = {
   kbPath:      argv['kb-path']      ?? process.env.CHERRYSTUDIO_KB_PATH ?? getDefaultKbPath(),
   embedUrl:    resolveEmbedUrl(argv['embed-url']     ?? process.env.EMBEDDING_URL),
   embedApiKey: argv['embed-api-key'] ?? process.env.EMBEDDING_API_KEY ?? '',
-  embedModel:  argv['embed-model']   ?? process.env.EMBEDDING_MODEL   ?? DEFAULTS.embedModel,
-  embedDim:    parseInt(argv['embed-dim']   ?? process.env.EMBEDDING_DIMENSION ?? DEFAULTS.embedDim, 10),
+  embedModel:  resolveRequired('embed-model', 'embed-model', 'EMBEDDING_MODEL'),
+  embedDim:    resolveRequiredInt('embed-dim', 'embed-dim', 'EMBEDDING_DIMENSION'),
 };
 
 export default config;
