@@ -28,6 +28,9 @@ description: Cherry Studio 知识库 MCP 服务
 }
 ```
 
+## IDE配置
+
+### opencode
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
