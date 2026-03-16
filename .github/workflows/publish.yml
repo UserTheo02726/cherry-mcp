@@ -4,10 +4,6 @@ on:
   push:
     branches: [main, master]
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -27,3 +23,5 @@ jobs:
       
       - name: Publish to NPM
         run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
