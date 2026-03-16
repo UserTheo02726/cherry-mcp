@@ -41,6 +41,7 @@ opencode
         "cherry-mcp",
         "--top-k", "10",
         "--threshold", "0.6",
+        "--max-fetch", "1000",
         "--kb-path", "C:\\Users\\你的用户名\\AppData\\Roaming\\CherryStudio\\Data\\KnowledgeBase",
         "--embed-url", "http://127.0.0.1:1234",
         "--embed-model", "text-embedding-qwen3-embedding-8b",
@@ -129,9 +130,9 @@ node src/index.js --kb-path "C:\Users\你的用户名\AppData\Roaming\CherryStud
 ### 高优先级
 
 - [x] **配置 NPM_TOKEN**：在 GitHub 仓库 Secrets 中添加 NPM_TOKEN，并取消 `.github/workflows/publish.yml` 中的发布步骤注释
-- [x] **移除硬编码默认值**：修改 `config.js`，移除 `embedModel` 和 `embedDim` 的默认值，要求用户必须显式提供
-- [x] **移除不确定路径**：修改 `getDefaultKbPath()`，移除不确定的 Linux/macOS 路径避免误导
 - [x] **发布到 npm**：配置完成后，首次发布到 npm 并验证 `npx cherry-mcp` 可正常运行
+- [ ] **移除不确定路径**：修改 `getDefaultKbPath()`，移除不确定的 Linux/macOS 路径避免误导
+- [ ] **移除硬编码默认值**：修改 `config.js`，移除 `embedModel` 和 `embedDim` 的默认值，要求用户必须显式提供
 
 ### 中优先级
 
