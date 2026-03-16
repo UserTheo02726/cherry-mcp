@@ -95,6 +95,7 @@ return {
 
 ### 5.1 必填参数
 以下参数为**必填**，必须通过 CLI 或环境变量提供：
+- `--embed-url`: Embedding API 地址
 - `--embed-model`: 向量模型 ID
 - `--embed-dim`: 向量维度
 

@@ -63,7 +63,7 @@ description: Cherry Studio 知识库 MCP 服务
 所有参数支持 CLI 传入，也可在 `env` 中以环境变量形式注入。  
 **优先级**：`CLI 参数 > 环境变量`
 
-> ⚠️ 以下参数为**必填**： `--embed-model`、`--embed-dim`
+> ⚠️ 以下参数为**必填**： `--embed-url`、`--embed-model`、`--embed-dim`
 
 - Windows 默认: C:\Users\<用户名>\AppData\Roaming\CherryStudio\Data\KnowledgeBase
 
@@ -74,7 +74,7 @@ description: Cherry Studio 知识库 MCP 服务
 | `--max-fetch <n>`    | `MAX_FETCH`               | `1000`                                   | 每库最多读取的记录数               |
 | `--kb-name <str>`    | `DEFAULT_KB_NAME`         | *(空，搜索全部)*                         | 限定搜索指定名称的知识库           |
 | `--kb-path <dir>`    | `CHERRYSTUDIO_KB_PATH`    | *(仅 Windows 自动识别，其他平台需手动指定)* | 知识库根目录路径                   |
-| `--embed-url <url>`  | `EMBEDDING_URL`           | `http://127.0.0.1:1234/v1/embeddings`   | Embedding API 地址                 |
+| `--embed-url <url>`  | `EMBEDDING_URL`           | *(必填)*                                 | Embedding API 地址                 |
 | `--embed-api-key`    | `EMBEDDING_API_KEY`       | *(空)*                                   | API Token（本地模型可留空）        |
 | `--embed-model <id>` | `EMBEDDING_MODEL`         | *(必填)*                                 | 向量模型 ID                        |
 | `--embed-dim <n>`    | `EMBEDDING_DIMENSION`     | *(必填)*                                 | 向量维度（须与模型实际输出一致）  |

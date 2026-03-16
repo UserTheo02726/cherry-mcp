@@ -38,18 +38,10 @@ const { values: argv } = parseArgs({
 
 /** 所有参数的内置默认值（集中管理，避免散落在各处）*/
 const DEFAULTS = {
-  embedUrl:   'http://127.0.0.1:1234/v1/embeddings',
   topK:       20,
   threshold:  0.5,
   maxFetch:   1000,
 };
-
-/** 解析 embed-url，自动补全 /v1/embeddings 路径，默认值来自 DEFAULTS */
-function resolveEmbedUrl(raw) {
-  if (!raw) return DEFAULTS.embedUrl;
-  const trimmed = raw.replace(/\/$/, '');
-  return trimmed.endsWith('/v1/embeddings') ? trimmed : `${trimmed}/v1/embeddings`;
-}
 
 /** 解析必填参数，如果未提供则抛出错误 */
 function resolveRequired(key, cliKey, envKey) {
@@ -80,7 +72,7 @@ const config = {
   maxFetch:    parseInt(argv['max-fetch']  ?? process.env.MAX_FETCH           ?? DEFAULTS.maxFetch,   10),
   kbName:      argv['kb-name']      ?? process.env.DEFAULT_KB_NAME    ?? null,
   kbPath:      argv['kb-path']      ?? process.env.CHERRYSTUDIO_KB_PATH ?? getDefaultKbPath(),
-  embedUrl:    resolveEmbedUrl(argv['embed-url']     ?? process.env.EMBEDDING_URL),
+  embedUrl:    resolveRequired('embed-url', 'embed-url', 'EMBEDDING_URL'),
   embedApiKey: argv['embed-api-key'] ?? process.env.EMBEDDING_API_KEY ?? '',
   embedModel:  resolveRequired('embed-model', 'embed-model', 'EMBEDDING_MODEL'),
   embedDim:    resolveRequiredInt('embed-dim', 'embed-dim', 'EMBEDDING_DIMENSION'),
