@@ -1,6 +1,6 @@
 {
   "name": "cherry-mcp",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Cherry Studio 知识库 MCP 服务 - 通过 npx 一键调用",
   "type": "module",
   "bin": {
@@ -12,7 +12,13 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "keywords": ["cherry-studio", "mcp", "knowledge-base", "rag", "vector-search"],
+  "keywords": [
+    "cherry-studio",
+    "mcp",
+    "knowledge-base",
+    "rag",
+    "vector-search"
+  ],
   "author": "Theo",
   "license": "MIT",
   "dependencies": {
