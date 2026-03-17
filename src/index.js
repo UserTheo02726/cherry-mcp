@@ -107,7 +107,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 
       const queryVector = await embedText(query);
       const results = await searchVectors(queryVector, {
-        topK: top_k ?? config.topK,
+        topK: config.topK,
         threshold: threshold ?? config.threshold,
         kbName: kb_name ?? config.kbName,
       });
