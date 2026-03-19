@@ -62,14 +62,18 @@ AI：调用 list_knowledge_bases 工具
 ```
 发现 2 个知识库：
 
-**技术文档**
-  路径: C:\Users\xxx\AppData\Roaming\CherryStudio\Data\KnowledgeBase\技术文档.db
-  大小: 15.2 MB | 向量数: 1234 | 维度: 4096
+**mW3rzDuJfCoDSKMi0nE5J**
+  路径: C:\Users\Theo\AppData\Roaming\CherryStudio\Data\KnowledgeBase\mW3rzDuJfCoDSKMi0nE5J.db
+  大小: 2.82 MB | 向量数: 378 | 维度: 1024
 
-**项目笔记**
-  路径: C:\Users\xxx\AppData\Roaming\CherryStudio\Data\KnowledgeBase\项目笔记.db
-  大小: 8.5 MB | 向量数: 567 | 维度: 4096
+**wgDxA02hPN2Bm0DAXHkFc**
+  路径: C:\Users\Theo\AppData\Roaming\CherryStudio\Data\KnowledgeBase\wgDxA02hPN2Bm0DAXHkFc.db
+  大小: 1.05 MB | 向量数: 124 | 维度: 1024
 ```
+
+> **注意**：知识库名称是 Cherry Studio 自动生成的 Base62 随机 ID（如 `mW3rzDuJfCoDSKMi0nE5J`），**并非** Cherry Studio UI 中显示的知识库别名。
+> 使用 `kb_name` 参数时须填写此 ID，而不是 UI 里起的名字。
+> 知识库文件名与 Cherry Studio UI 中显示的知识库别名无关。文件名才是 MCP 真正使用的知识库名称。
 
 ### 示例 2：搜索文档
 
@@ -126,6 +130,6 @@ useCallback 和 useMemo 用于缓存函数和计算结果...
 
 ## 项目信息
 
-- **npm 包**: cherry-mcp
-- **源码**: `D:\code\cherry-mcp\src\`
-- **文档**: 原 MCP 服务基于 `@modelcontextprotocol/sdk` 实现
+- **npm 包**: `cherry-mcp`
+- **文档**: MCP 服务基于 `@modelcontextprotocol/sdk` 实现
+- **配置参考**: `references/mcp-config.md`

@@ -59,15 +59,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
           top_k: {
             type: 'number',
-            description: `最多返回结果数（默认 ${config.topK}）。`,
+            description: `最多返回结果数，默认使用用户配置值 ${config.topK}。仅当用户在本次对话中明确提出不同数量要求时才需传入。`,
           },
           threshold: {
             type: 'number',
-            description: `相似度最低阈值，范围 0–1（默认 ${config.threshold}）。`,
+            description: `相似度阈值，范围 0–1，默认使用用户配置值 ${config.threshold}。仅当用户在本次对话中明确提出不同阈值要求时才需传入。`,
           },
           kb_name: {
             type: 'string',
-            description: '限定搜索范围到指定名称的知识库（不填则搜索全部）。',
+            description: `限定搜索指定名称的知识库（请输入精确的 Base62 ID，而非中文别名）。若不传入，默认使用用户配置的基础限制（当前默认: ${config.kbName || '无限制，即搜索全部'}）。`,
           },
         },
         required: ['query'],
@@ -107,10 +107,14 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 
       const queryVector = await embedText(query);
       const results = await searchVectors(queryVector, {
-        topK: config.topK,
+        topK: top_k ?? config.topK,
         threshold: threshold ?? config.threshold,
-        kbName: kb_name ?? config.kbName,
+        kbName: (kb_name && kb_name.trim() !== '') ? kb_name.trim() : config.kbName,
       });
+
+      if (results.isError) {
+        return { content: [{ type: 'text', text: results.message }], isError: true };
+      }
 
       if (!results.length) {
         return { content: [{ type: 'text', text: `「${query}」未匹配到任何高相似度内容。` }] };

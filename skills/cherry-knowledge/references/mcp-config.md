@@ -96,9 +96,7 @@
 
 ## Cursor
 
-1. 打开 Cursor 设置（`Cmd+,` 或 `Ctrl+,`）
-2. 找到 `MCP` 或 `Extensions` 设置
-3. 添加新的 MCP Server：
+创建或编辑项目级配置 `.cursor/mcp.json`（全局配置为 `~/.cursor/mcp.json`）：
 
 ```json
 {
@@ -116,19 +114,19 @@
 }
 ```
 
-或者通过 UI 配置：
-- Server Name: `cherry-mcp`
-- Command: `npx`
-- Arguments: `-y cherry-mcp --embed-url http://127.0.0.1:1234 --embed-model text-embedding-qwen3-embedding-8b --embed-dim 4096`
+修改后在 Cursor 中重启或重载窗口生效。
 
-## VS Code (with VS Code extension)
+## VS Code（原生 MCP 支持）
 
-安装 MCP 扩展（如 `MCP for VS Code`），然后在 settings.json 中添加：
+> VS Code 1.99+ 原生支持 MCP，无需额外扩展。
+
+创建或编辑 `.vscode/mcp.json`（项目级）或用户全局配置：
 
 ```json
 {
-  "mcp.servers": {
+  "servers": {
     "cherry-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": [
         "-y", "cherry-mcp",

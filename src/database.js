@@ -98,7 +98,14 @@ function probeDatabase(filePath, SQL) {
  */
 export async function listKnowledgeBases() {
   const SQL = await getSqlEngine();
-  const files = collectDbFiles();
+  let files = collectDbFiles();
+
+  // 如果启动时配置了明确的 `--kb-name` 参数，优先仅展示被锁定的该知识库
+  if (config.kbName) {
+    const target = config.kbName.trim();
+    files = files.filter(f => basename(f, extname(f)) === target);
+  }
+
   const result = [];
 
   for (const filePath of files) {
@@ -108,20 +115,12 @@ export async function listKnowledgeBases() {
     const stat = statSync(filePath);
     const vectorCount = probe.count;
     
-    // 根据向量数计算建议参数
-    const suggestedTopK = Math.min(50, Math.max(20, Math.floor(vectorCount / 50)));
-    const suggestedMaxFetch = Math.min(5000, Math.max(500, vectorCount * 2));
-    const suggestedThreshold = 0.5;
-
     result.push({
       name: basename(filePath, extname(filePath)),
       path: filePath,
       sizeMb: +(stat.size / 1024 / 1024).toFixed(2),
       vectorCount,
       dimension: probe.dimension ?? 'unknown',
-      suggestedTopK,
-      suggestedMaxFetch,
-      suggestedThreshold,
     });
   }
 
@@ -180,7 +179,16 @@ export async function searchVectors(queryVector, { topK, threshold, kbName } = {
 
   // 按知识库名称过滤
   if (kbName) {
-    files = files.filter(f => basename(f, extname(f)) === kbName);
+    const target = kbName.trim();
+    files = files.filter(f => basename(f, extname(f)) === target);
+    
+    // 增加异常提示：如果过滤后找不到文件，则明确告知输入的知识库不存在
+    if (files.length === 0) {
+      return { 
+        isError: true, 
+        message: `指定的知识库 '${kbName}' 不存在，请通过 list_knowledge_bases 工具检查实际存在哪些库。` 
+      };
+    }
   }
 
   const tk = topK ?? config.topK;
