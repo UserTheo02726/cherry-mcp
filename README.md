@@ -85,7 +85,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/你的用户名/cherry-mcp.git
+git clone https://github.com/UserTheo02726/cherry-mcp.git
 cd cherry-mcp
 
 # 安装依赖
