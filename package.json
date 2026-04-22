@@ -7,7 +7,8 @@
     "cherry-mcp": "./src/index.js"
   },
   "files": [
-    "src/"
+    "src/",
+    "docs/"
   ],
   "engines": {
     "node": ">=20.0.0"
