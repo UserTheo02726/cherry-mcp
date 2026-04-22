@@ -54,6 +54,7 @@
   }
 }
 ```
+> 更多配置示例请参阅 [mcp-config.md](docs/mcp-config.md)
 
 ## 参数配置
 

@@ -98,8 +98,8 @@ CLI 参数 > 环境变量 > 内置默认值
 | 操作系统 | 默认路径 |
 |----------|----------|
 | Windows | `C:\Users\{用户名}\AppData\Roaming\CherryStudio\Data\KnowledgeBase` |
-| macOS | `~/Library/Application Support/CherryStudio/Data/KnowledgeBase` |
-| Linux | `~/.config/CherryStudio/Data/KnowledgeBase` |
+| macOS (未经测试)| `~/Library/Application Support/CherryStudio/Data/KnowledgeBase` |
+| Linux (未经测试)| `~/.config/CherryStudio/Data/KnowledgeBase` |
 
 ### --embed-api-key
 
